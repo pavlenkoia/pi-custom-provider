@@ -1,0 +1,7 @@
+# pi runtime state (may contain provider ids) — regenerated at load time
+.pi/agent/custom-provider-state.json
+
+# node modules when someone runs npm install in the repo
+node_modules/
+package-lock.json
+npm-shrinkwrap.json
