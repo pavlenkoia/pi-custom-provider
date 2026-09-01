@@ -1,7 +1,7 @@
 {
-  "name": "@you/pi-custom-provider",
+  "name": "@pavlenkoia/pi-custom-provider",
   "version": "1.0.0",
-  "description": "Pi extension: manage custom OpenAI-compatible model providers (add, edit, refresh, delete) and register their models in the pi AI catalogue.",
+  "description": "Расширение pi: управление кастомными провайдерами OpenAI-совместимого API (добавление, редактирование, обновление, удаление) и регистрация их моделей в каталоге AI pi.",
   "keywords": [
     "pi-package",
     "pi-extension",
