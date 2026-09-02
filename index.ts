@@ -199,17 +199,53 @@ function saveState(state: ProviderState): void {
   );
 }
 
+type LiteLLMModelGroup = {
+  model_group: string;
+  supports_vision?: boolean;
+  supports_reasoning?: boolean;
+  max_input_tokens?: number;
+  max_output_tokens?: number;
+};
+
 function modelsUrl(baseUrl: string): string {
   return new URL("models", `${baseUrl}/`).toString();
 }
 
+function modelGroupInfoUrl(baseUrl: string): string {
+  const url = new URL(baseUrl);
+  url.pathname = url.pathname.replace(/\/v1\/?$/, "/");
+  return new URL("model_group/info", url).toString();
+}
+
+function authHeaders(apiKey: string): HeadersInit {
+  return {
+    Authorization: `Bearer ${apiKey}`,
+    Accept: "application/json",
+  };
+}
+
+async function fetchLiteLLMModelGroups(baseUrl: string, apiKey: string): Promise<Map<string, LiteLLMModelGroup>> {
+  try {
+    const response = await fetch(modelGroupInfoUrl(baseUrl), { headers: authHeaders(apiKey) });
+    if (!response.ok) return new Map();
+
+    const payload = (await response.json()) as { data?: LiteLLMModelGroup[] };
+    if (!Array.isArray(payload.data)) return new Map();
+
+    return new Map(
+      payload.data
+        .filter((group): group is LiteLLMModelGroup => Boolean(group && typeof group.model_group === "string"))
+        .map((group) => [group.model_group, group]),
+    );
+  } catch {
+    // /model_group/info is LiteLLM-specific. Generic OpenAI-compatible
+    // providers continue using only their standard /models response.
+    return new Map();
+  }
+}
+
 async function fetchModels(baseUrl: string, apiKey: string): Promise<RemoteModel[]> {
-  const response = await fetch(modelsUrl(baseUrl), {
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      Accept: "application/json",
-    },
-  });
+  const response = await fetch(modelsUrl(baseUrl), { headers: authHeaders(apiKey) });
 
   if (!response.ok) {
     throw new Error(`GET /models failed: ${response.status} ${await response.text()}`);
@@ -225,7 +261,20 @@ async function fetchModels(baseUrl: string, apiKey: string): Promise<RemoteModel
     throw new Error(`No models found at ${modelsUrl(baseUrl)}`);
   }
 
-  return models.filter((model): model is RemoteModel => Boolean(model && typeof model.id === "string" && model.id));
+  const groups = await fetchLiteLLMModelGroups(baseUrl, apiKey);
+  return models
+    .filter((model): model is RemoteModel => Boolean(model && typeof model.id === "string" && model.id))
+    .map((model) => {
+      const group = groups.get(model.id);
+      if (!group) return model;
+      return {
+        ...model,
+        supports_vision: group.supports_vision ?? model.supports_vision,
+        supports_reasoning: group.supports_reasoning ?? model.supports_reasoning,
+        context_window: group.max_input_tokens ?? model.context_window,
+        max_output_tokens: group.max_output_tokens ?? model.max_output_tokens,
+      };
+    });
 }
 
 function registerProfile(pi: ExtensionAPI, profile: ProviderProfile, remoteModels: RemoteModel[]): void {
