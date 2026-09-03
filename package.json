@@ -1,6 +1,6 @@
 {
   "name": "@pavlenkoia/pi-custom-provider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Расширение pi: управление кастомными провайдерами OpenAI-совместимого API (добавление, редактирование, обновление, удаление) и регистрация их моделей в каталоге AI pi.",
   "keywords": [
     "pi-package",
@@ -10,11 +10,30 @@
   ],
   "license": "MIT",
   "type": "module",
+  "files": [
+    "index.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pavlenkoia/pi-custom-provider.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pavlenkoia/pi-custom-provider/issues"
+  },
+  "homepage": "https://github.com/pavlenkoia/pi-custom-provider#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {},
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
   },
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": [
+      "./index.ts"
+    ]
   }
 }
