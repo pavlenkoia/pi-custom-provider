@@ -1,6 +1,6 @@
 {
   "name": "@pavlenkoia/pi-custom-provider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Расширение pi: управление кастомными провайдерами OpenAI-совместимого API (добавление, редактирование, обновление, удаление) и регистрация их моделей в каталоге AI pi.",
   "keywords": [
     "pi-package",
@@ -32,6 +32,8 @@
     "@earendil-works/pi-coding-agent": "*"
   },
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": [
+      "./index.ts"
+    ]
   }
 }
