@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { CONFIG_DIR_NAME } from "@earendil-works/pi-coding-agent";
+import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 type ProviderProfile = {
@@ -45,22 +45,20 @@ type RemoteModel = {
   };
 };
 
-function resolveConfigPath(cwd: string = process.cwd()): string {
-  return join(
-    cwd,
-    CONFIG_DIR_NAME ?? ".pi",
-    "agent",
-    "custom-provider.json",
-  );
+/**
+ * Resolve config/state paths through pi's own agent-dir resolution instead of
+ * the extension process cwd. Extensions may run with an arbitrary cwd (whatever
+ * directory pi was launched from), so anchoring to it would split saved data by
+ * launch folder and break a fresh clone. Always use pi's global `~/.pi/agent`
+ * (honouring pi's config-dir override) so providers persist across projects and
+ * reload automatically on new clones.
+ */
+function resolveConfigPath(): string {
+  return join(getAgentDir(), "custom-provider.json");
 }
 
-function resolveStatePath(cwd: string = process.cwd()): string {
-  return join(
-    cwd,
-    CONFIG_DIR_NAME ?? ".pi",
-    "agent",
-    "custom-provider-state.json",
-  );
+function resolveStatePath(): string {
+  return join(getAgentDir(), "custom-provider-state.json");
 }
 const PROVIDER_ID_PREFIX = "custom-";
 const LEGACY_PROVIDER_IDS = ["custom", "openai-http", "provider"];
