@@ -1,5 +1,8 @@
 # @pavlenkoia/pi-custom-provider
 
+[![npm version](https://img.shields.io/npm/v/%40pavlenkoia%2Fpi-custom-provider)](https://www.npmjs.com/package/@pavlenkoia/pi-custom-provider)
+[![Publish package](https://github.com/pavlenkoia/pi-custom-provider/actions/workflows/publish.yml/badge.svg)](https://github.com/pavlenkoia/pi-custom-provider/actions/workflows/publish.yml)
+
 Расширение pi, которое даёт возможность pi управлять **кастомными провайдерами OpenAI-совместимого API** — добавлять, редактировать, обновлять и удалять их, а также регистрировать модели, которые они выдают, в каталоге AI самой pi.
 
 Работает с любым endpoint'ом OpenAI-compat (vLLM, Ollama `--api openai`, LM Studio, text-generation-webui, прокси together-inference, самописные шлюзы и т. п.).
@@ -28,7 +31,7 @@
 ## Требования
 
 - pi ≥ 1.x
-- Node.js (пирингирует пакет pi)
+- Node.js (используется pi)
 
 Шаг сборки не требуется — расширения загружаются напрямую через jiti, поэтому TypeScript работает без компиляции.
 
@@ -42,9 +45,16 @@ pi install git:github.com/pavlenkoia/pi-custom-provider@main
 
 ### Из npm
 
+Установка актуальной версии из npm:
+
 ```bash
-npm login --registry=https://registry.npmjs.org/   # выложить один раз
-pi install npm:@pavlenkoia/pi-custom-provider@1.0.0
+pi install npm:@pavlenkoia/pi-custom-provider
+```
+
+Установка конкретной версии:
+
+```bash
+pi install npm:@pavlenkoia/pi-custom-provider@1.0.2
 ```
 
 ### Попробовать без установки (временно, только для текущего запуска)
@@ -52,14 +62,26 @@ pi install npm:@pavlenkoia/pi-custom-provider@1.0.0
 ```bash
 pi -e git:github.com/pavlenkoia/pi-custom-provider@main
 # или после публикации:
-pi -e npm:@pavlenkoia/pi-custom-provider@1.0.0
+pi -e npm:@pavlenkoia/pi-custom-provider@1.0.2
 ```
 
 ## Обновление
 
+Для npm-установки:
+
+```bash
+pi update --extension npm:@pavlenkoia/pi-custom-provider
+```
+
+Для git-установки:
+
 ```bash
 pi update --extension git:github.com/pavlenkoia/pi-custom-provider@main
-# или все расширения сразу:
+```
+
+Или обновить все расширения сразу:
+
+```bash
 pi update --extensions
 ```
 
@@ -91,10 +113,34 @@ cp index.ts ~/.pi/agent/extensions/pi-custom-provider.ts
 
 ## Разработка
 
-Расширение — это одиночный TypeScript-модуль. Чтобы проверить его локально (типы + импорты), можно запустить pi против него:
+Расширение — это одиночный TypeScript-модуль. Шаг сборки не требуется: pi загружает TypeScript напрямую через jiti.
+
+Чтобы проверить расширение локально:
 
 ```bash
 pi -e ./index.ts
+```
+
+## Публикация новой версии
+
+Публикация автоматизирована через GitHub Actions и npm Trusted Publishing (OIDC). Workflow находится в `.github/workflows/publish.yml` и запускается при отправке тега формата `vX.Y.Z`.
+
+Для выпуска patch-версии:
+
+```bash
+git checkout main
+git pull origin main
+npm version patch
+git push origin main --follow-tags
+```
+
+Команда `npm version` обновит версию в `package.json`, создаст commit и тег. После отправки тега GitHub Actions проверит пакет и опубликует его в npm с provenance.
+
+Для minor или major-релиза используйте соответственно:
+
+```bash
+npm version minor
+npm version major
 ```
 
 ## Лицензия
